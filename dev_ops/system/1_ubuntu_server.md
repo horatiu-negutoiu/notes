@@ -1,5 +1,7 @@
 # System / Ubuntu Server
 
+## Prevent Server from Sleep
+
 Prevent server from going to sleep if lid is closed:
 ```
 # ssh into the server
@@ -11,4 +13,11 @@ $ sudo nano /etc/default/grub
 
 $ sudo update-grub
 $ sudo reboot
+```
+
+## Useful Packages
+
+```
+sudo apt-get install -y \
+    usbmount
 ```

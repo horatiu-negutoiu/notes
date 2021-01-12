@@ -40,6 +40,8 @@ $ sudo usermod -aG docker $USER
 $ docker run hello-world
 ```
 
+There shouldn't be error messages of the type `Got permission denied while trying to connect to the Docker daemon socket ...`
+
 ### Configure Docker to start on boot
 
 ```bash
