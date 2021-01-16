@@ -1,6 +1,6 @@
 # Python Environments
 
-Pyenv and Pipenv are a solid combination together. Pyenv allows setting of desired python versions by specifying it in a `.python-version` file. Pipenv then will create a virtual environment, using that python version, along with locking down of package versions.
+Pyenv and Pipenv are a solid combination together. Pyenv allows setting of desired python versions by specifying it in a `.python-version` file. Then, Pipenv will create a virtual environment, using that python version, along with locking down of package versions.
 
 As an added bonus, installing Oh-My-Zsh along with a nice theme can be a nice bonus to a clean, stable, predictable environment.
 
@@ -31,56 +31,113 @@ $ pip3 install pipenv  # might have to use pip3 instead of pip here, when two ve
 
 ## Finally: Creating environments
 
+### Type 1: New project, new Pipfile.
+
 ```
-# either from an existing Pipfile
+# create a directory
+$ mkdir project-name
+
+# decide on python version
+$ touch .python-version
+$ nano .python-version
+# fill in with desired MAJOR.MINOR.PATCH version, save and close
+# check with
+$ python -V
+MAJOR.MINOR.PATCH          # but not the system one, the .python-version one
+
+# create an environment using pipenv, but specify python version
+# ensure python version matches the MAJOR.MINOR version from the .python-version file
+$ pipenv install --python 3.8
+# returns
+Virtualenv location: /Users/user.name/.local/share/virtualenvs/project-name-Rh9gqIPi
+
+# activate the environment
+$ pipenv shell
+# also good idea at this point to setup your interpreter in your favourite IDE
+
+# BUT,
+$ (project-name) which pipenv
+# returns..
+/Users/user.name/.pyenv/shims/pipenv
+# which isn't wanted - this is the "system" version of pipenv
+
+# install pipenv inside the environment in order to play nice with the environment's python version
+$ (project-name) pip install pipenv
+
+# now,
+$ (project-name) which pipenv
+# returns
+/Users/user.name/.local/share/virtualenvs/project-name-Rh9gqIPi/bin/pipenv
+
+# success!
+# this setup guards against package installation errors, where the pipenv version doesn't match the working python version
+```
+
+### Type 2: Existing Pipfile
+
+Assumptions:
+
+- there is no `.python-version` file to force the python version
+- there is no other environment installed matching this project's location
+
+```
+# open a new Terminal, cd into the Pipfile directory
+$ cd project-name
+
+# some preliminary checks
+$ which python
+/Users/user.name/.pyenv/shims/python
+$ python -V
+Python 2.7.16
+$ python3 -V
+Python 3.8.6
+$ which pipenv
+/Users/user.name/.pyenv/shims/pipenv
+
+# install the environment
 $ pipenv install
-# or create a new Pipfile
-$ pipenv install package==0.0.0
+Using /usr/local/bin/python3.8 (3.8.6) to create virtualenv…
+Virtualenv location: /Users/user.name/.local/share/virtualenvs/project-name-Rh9gqIPi
+# the system's pipenv used the info inside the Pipfile to force the python version
 
-$ pipenv shell  # activate the env
-(activated-env) $ pip install pipenv  # install pipenv again into that environment.
-#                                       this will get rid of any pipenv inconsistencies between your "system" pipenv and your "environment" python
+# activate the environment
+$ pipenv shell
 
-(activated-env) $ which pipenv  # should point into the environment, not into the system
+# some more checks
+$ (project-name) which python
+/Users/user.name/.local/share/virtualenvs/project-name-Rh9gqIPi/bin/python
+$ (project-name) which pipenv
+/Users/user.name/.pyenv/shims/pipenv
+
+# # install pipenv inside the environment in order to play nice with the environment's python version
+$ (project-name) pip install pipenv
+$ (project-name) which pipenv
+/Users/user.name/.local/share/virtualenvs/project-name-Rh9gqIPi/bin/pipenv
+
+# success!
+# this setup guards against package installation errors, where the pipenv version doesn't match the working python version
 ```
 
 Last step is to set up the interpreter to point into the new environment. This way, every time a new terminal window is launched, it automatically activates the environment.
 
+## Old Way - using virtualenv
 
-
-
-
-
-
-
-
-#### OLD INSTALL - virtualenv ####
-## Prerequisites - Python 3.6
-
-```shell
+```
+# EITHER prerequisites - Python 3.6
 $ sudo apt-get install -y python3-pip build-essential libssl-dev libffi-dev python-dev python3-venv
-```
 
-## Creating Environments
-
-```shell
-$ python3 -m venv my_env
-```
-
-## Activating Environments
-
-```shell
-$ source my_env/bin/activate
-```
-
-...and we get...
-
-```shell
-(my_env) horatiu@horatiu:~/environments
-```
-
-# Prerequisites - Python 3.8
-
-```
+# OR prerequisites - Python 3.8
 $ sudo apt-get -y install liblapack-dev libblas-dev gfortran
+
+# create environment
+$ python3 -m venv my_env
+
+# activate environment
+$ source my_env/bin/activate
+# and this results in
+(my_env) user@user:~/environments
+
+# done
+# but this forces us to use `pip` and `requirements.txt`
+# which doesn't enforce dependency versions
 ```
