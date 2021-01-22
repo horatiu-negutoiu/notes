@@ -1,4 +1,7 @@
-# Kubernetes / Usage
+# Kubernetes / Deployments
+
+Cheatsheet:
+https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
 ## Creating Deployments
 
@@ -53,4 +56,11 @@ kubectl exec -it $POD_ID -- /bin/bash
 kubectl delete deployment $DEPLOYMENT_NAME
 ```
 Everything else below that deployment will be removed automatically.
+..but not always.
+You can propagate and force the policy to delete dependents using:
 
+```
+kubectl delete replicaset my-repset --cascade=orphan
+```
+
+## 

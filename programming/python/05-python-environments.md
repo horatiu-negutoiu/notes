@@ -38,9 +38,7 @@ $ pip3 install pipenv  # might have to use pip3 instead of pip here, when two ve
 $ mkdir project-name
 
 # decide on python version
-$ touch .python-version
-$ nano .python-version
-# fill in with desired MAJOR.MINOR.PATCH version, save and close
+$ echo $MAJOR.$MINOR.$PATCH > .python-version
 # check with
 $ python -V
 MAJOR.MINOR.PATCH          # but not the system one, the .python-version one
@@ -77,7 +75,7 @@ $ (project-name) which pipenv
 
 Assumptions:
 
-- there is no `.python-version` file to force the python version
+- there is no `.python-version` file to force the python version (but the presence of one is only beneficial)
 - there is no other environment installed matching this project's location
 
 ```
@@ -137,7 +135,5 @@ $ source my_env/bin/activate
 # and this results in
 (my_env) user@user:~/environments
 
-# done
-# but this forces us to use `pip` and `requirements.txt`
-# which doesn't enforce dependency versions
+# done, but this forces us to use `pip` and `requirements.txt`, which doesn't enforce dependency versions
 ```

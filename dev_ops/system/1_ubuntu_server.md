@@ -1,7 +1,15 @@
 # System / Ubuntu Server
 
 ## Log files
+
 https://help.ubuntu.com/community/LinuxLogFiles
+
+## Installing Binaries
+
+https://unix.stackexchange.com/questions/36871/where-should-a-local-executable-be-placed
+
+1. If a non-system installed and maintained binary needs to be accessible system-wide to multiple users, it should be placed by an administrator into `/usr/local/bin`
+2. If you are the only user of a binary, installing into `$HOME/bin` is the appropriate location since you can install it yourself and you will be the only consumer.
 
 ## System Information
 

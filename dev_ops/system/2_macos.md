@@ -1,4 +1,10 @@
 # System / MacOS
+
+## Installed Packages
+
+=== brew ========
+brew install terraform tfenv tflint helm autoconf automake libtool shtool
+
 ## List of running processe occupying a port
 
 ```

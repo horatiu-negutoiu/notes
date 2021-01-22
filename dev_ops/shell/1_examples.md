@@ -1,5 +1,10 @@
 # Dev Ops / Shell
 
+Move files:
+```
+$ mv ~/Downloads/some-file.md .         # moves to current directory
+```
+
 Export variables:
 ```
 $ export VAR_NAME=var_value

@@ -28,7 +28,7 @@ Run an image in the background:
 $ docker run -it -d -p 5000:80 <image-name>
 ```
 
-Clean up - removes all unused images
+**Clean up** - removes all unused images
 ```
 $ docker system prune
 ```
