@@ -29,6 +29,26 @@ $ pip3 install pipenv  # might have to use pip3 instead of pip here, when two ve
 # pipenv gets installed into the system
 ```
 
+## Recommended: direnv
+
+Docs:
+Install: https://direnv.net/#docs
+Hook into shell: https://direnv.net/docs/hook.html
+
+```
+$ brew install direnv
+```
+
+Add the following line at the end of the ~/.zshrc file:
+```
+eval "$(direnv hook zsh)"
+```
+
+Reload the shell with:
+```
+source ~/.zshrc
+```
+
 ## Finally: Creating environments
 
 ### Type 1: New project, new Pipfile.
@@ -46,7 +66,6 @@ MAJOR.MINOR.PATCH          # but not the system one, the .python-version one
 # create an environment using pipenv, but specify python version
 # ensure python version matches the MAJOR.MINOR version from the .python-version file
 $ pipenv install --python 3.8
-# returns
 Virtualenv location: /Users/user.name/.local/share/virtualenvs/project-name-Rh9gqIPi
 
 # activate the environment
@@ -117,6 +136,35 @@ $ (project-name) which pipenv
 ```
 
 Last step is to set up the interpreter to point into the new environment. This way, every time a new terminal window is launched, it automatically activates the environment.
+
+## Type 3: New Project, Jupyter Lab
+
+```
+# create an environment with Pipenv
+$ mkdir project-name && cd project-name
+$ pipenv install --python 3.7
+$ pipenv shell
+$ pip install pipenv
+
+# install jupyter lab and other required packages
+$ pipenv install jupyterlab
+$ pipenv install feast          # just for example
+```
+
+Optionally, use `direnv` to write any environment variables to your 
+
+```
+# run jupyter lab
+$ jupyter lab
+```
+
+Inside the notebook, import your packages
+```
+from feast import Client        # should run without issues
+```
+
+**IMPORTANT**
+When installing packages, remember to do so from the command line and restart the kernel.
 
 ## Old Way - using virtualenv
 
