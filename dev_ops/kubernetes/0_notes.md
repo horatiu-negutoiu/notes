@@ -10,3 +10,7 @@ To install, follow the steps:
 1. `kubectl`
 2. `minikube`
 3. `nginx` forwading
+
+## Good Addons
+
+`kubectx` and `kubens`

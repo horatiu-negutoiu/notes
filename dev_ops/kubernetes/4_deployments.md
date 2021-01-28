@@ -62,5 +62,3 @@ You can propagate and force the policy to delete dependents using:
 ```
 kubectl delete replicaset my-repset --cascade=orphan
 ```
-
-## 
