@@ -71,8 +71,3 @@ https://github.com/feast-dev/feast
 - we can also populate online storage from streaming job
   - using `client.start_stream_to_online_ingestion(...)`
   - this provides a **continuous source of up-to-date data**
-
-Some questions not answered yet:
-Does the offline store update itself if we're streaming into the online store?
-
-

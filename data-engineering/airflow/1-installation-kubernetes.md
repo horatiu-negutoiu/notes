@@ -1,4 +1,4 @@
-# Airflow / Installation
+# Airflow / Installation on Kubernetes
 
 Ensure Kubernetes is deployed/installed and the `kubectl` command points to the cluster.
 
