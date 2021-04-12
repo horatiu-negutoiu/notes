@@ -137,6 +137,29 @@ $ (project-name) which pipenv
 
 Last step is to set up the interpreter to point into the new environment. This way, every time a new terminal window is launched, it automatically activates the environment.
 
+## Type 2-B: Existing Pipfile with .python-version present
+
+When a `.python-version` file is present, the command `pipenv install` will only work if pipenv is installed for _that_ version of python. The user will be notified of the absence of pipenv like so:
+```
+pipenv install
+pyenv: pipenv: command not found
+
+The `pipenv' command exists in these Python versions:
+  3.6.6
+  ...
+
+Note: See 'pyenv help global' for tips on allowing both
+      python2 and python3 to be found.
+```
+
+In this case, the first step is:
+```
+$ pip install pipenv
+```
+
+After this, follow the same steps in section (2).
+
+
 ## Type 3: New Project, Jupyter Lab
 
 ```
