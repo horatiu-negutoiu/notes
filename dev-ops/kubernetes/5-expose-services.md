@@ -15,11 +15,11 @@ NAME                                           TYPE        CLUSTER-IP      EXTER
 ## Port-forward an Existing Service
 
 ```
-$ kubectl port-forward svc/<service-name> 8080:80
+$ kubectl port-forward svc/<service-name> <from port>:<to port>
 Forwarding from 127.0.0.1:8080 -> 3000
 Forwarding from [::1]:8080 -> 3000
 
-# this will only be available from http://localhost:8080
+# this will only be available from http://localhost:<from port>
 # aka. kubectl acts as a proxy, ssh-ing and thus tunneling into the cluster
 ```
 
