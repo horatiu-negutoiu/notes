@@ -5,29 +5,37 @@ Using this repo to keep track of solutions to problems I've had so I can come ba
 ## Table of Contents by Category
 
 1. Programming
-    1. [General Patterns and Solutions](programming/general_patterns_and_solutions)
+    1. [General Patterns and Solutions](programming/general-patterns-and-solutions)
     2. [git](programming/git)
     3. [Python](programming/python)
     4. [Brew](programming/brew)
-    5. [Distributed Systems](programming/distributed_systems)
+    5. [Distributed Systems](programming/distributed-systems)
+    6. [Java](programming/java)
 2. Dev Ops
-    1. [system](dev_ops/system)
-    2. [shell](dev_ops/shell)
-    3. [AWS](dev_ops/aws)
-    4. [GCloud](dev_ops/gcloud)
-    5. [Terraform](dev_ops/terraform)
-    6. [Docker](dev_ops/docker)
-    7. [Kubernetes](dev_ops/kubernetes)
+    1. [system](dev-ops/system)
+    2. [shell](dev-ops/shell)
+    3. [AWS](dev-ops/aws)
+    4. [GCloud](dev-ops/gcloud)
+    5. [Terraform](dev-ops/terraform)
+    6. [Docker](dev-ops/docker)
+    7. [Kubernetes](dev-ops/kubernetes)
 3. Data Engineering
-    1. [Airflow / GCP Composer](data_engineering/airflow_gcp_composer)
+    1. [Airflow](data-engineering/airflow)
+    2. [Airflow / GCP Composer](data-engineering/airflow-gcp-composer)
+    3. [GCP / Dataflow](data-engineering/dataflow)
+    4. [Feast](data-engineering/feast)
+    5. [Pandas](data-engineering/pandas)
+    6. [SQL](data-engineering/sql)
 4. Machine Learning
-    1. [General Guidelines](machine_learning/general_guidelines)
-    2. [Implementation](machine_learning/implementation)
+    1. [General Guidelines](machine-learning/general-guidelines)
+    2. [Implementation](machine-learning/implementation)
+    3. [Kubeflow](machine-learning/kubeflow)
+    4. [MLFlow](machine-learning/mlflow)
 
 ## Archive
-- [data_engineering/apache_spark](xx_archive/data_engineering/apache_spark)
-- [data_engineering/hadoop](xx_archive/data_engineering/hadoop)
-- [visualizations](xx_archive/visualizations)
+- [data_engineering/apache_spark](xx-archive/data-engineering/apache-spark)
+- [data_engineering/hadoop](xx-archive/data-engineering/hadoop)
+- [visualizations](xx-archive/visualizations)
 
 ## Topics of Interest
 
