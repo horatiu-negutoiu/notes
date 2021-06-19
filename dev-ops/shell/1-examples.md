@@ -65,3 +65,12 @@ $ find / -type f -name "kube*"
 # ignore case
 $ find / -type f -iname "kube*"
 ```
+
+
+### Replace characters in string
+
+MYSQL_USERNAME=$(echo $MYSQL_USERNAME | tr -d '\n')
+
+run some server "mysql+mysqlconnector://${MYSQL_USERNAME}"
+
+mlflow server -p 5000 --backend-store-uri "mysql+mysqlconnector://${MYSQL_USERNAME}:${MYSQL_PASSWORD}@${MYSQL_HOST}:3306/${MYSQL_DB}" --default-artifact-root "${DEFAULT_ARTIFACT_ROOT}" --host 0.0.0.0
