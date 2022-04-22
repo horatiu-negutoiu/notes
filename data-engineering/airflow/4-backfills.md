@@ -35,6 +35,13 @@
   **NOTICE**, all these Dag's start times will be 4:10
   ```
 
+
+## Backfill Command
+
+```
+airflow dags backfill................ ?
+```
+
 ## Good Practices
 
 Given that multiple DagRun instances will possibly be started, make sure:
