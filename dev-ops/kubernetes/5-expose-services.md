@@ -15,7 +15,7 @@ NAME                                           TYPE        CLUSTER-IP      EXTER
 ## Port-forward an Existing Service
 
 ```
-$ kubectl port-forward svc/<service-name> <from port>:<to port>
+$ kubectl port-forward svc/<service-name> <port you type in your browser>:<port running the service in the cluster>
 Forwarding from 127.0.0.1:8080 -> 3000
 Forwarding from [::1]:8080 -> 3000
 
