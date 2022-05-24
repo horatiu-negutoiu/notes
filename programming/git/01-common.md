@@ -75,3 +75,14 @@ gitstash nice
 
 gitstashapply nice
 ```
+
+## Squashing Commits
+
+To squash the lat 4 commits:
+```
+git rebase -i HEAD~4
+```
+
+Then, using vi, press `i`, rename the `commit` to `squash`, leaving only the last one alone. Then, `Esc`, `:wq` to save and quit.
+
+Finally, `i` and update or comment out the commit messages, then `Esc`, `:wq` to save and quit.`
