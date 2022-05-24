@@ -7,11 +7,13 @@ $ git clean -df # removes untracked files and dirs
 ```
 
 
-## Squash Commits (ex: last 2 commits)
+## Squash Commits
+
+Ex: squash last 2 commits:
 ```
 $ git rebase -i HEAD~2
 
-# but it's recommended to measure twice, cut once:
+# but it's recommended to measure twice, cut once with:
 $ git log --oneline
 ```
 
@@ -75,14 +77,3 @@ gitstash nice
 
 gitstashapply nice
 ```
-
-## Squashing Commits
-
-To squash the lat 4 commits:
-```
-git rebase -i HEAD~4
-```
-
-Then, using vi, press `i`, rename the `commit` to `squash`, leaving only the last one alone. Then, `Esc`, `:wq` to save and quit.
-
-Finally, `i` and update or comment out the commit messages, then `Esc`, `:wq` to save and quit.`

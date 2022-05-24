@@ -55,3 +55,11 @@ $ docker run --privileged -it $IMAGE:$TAG /bin/sh
 
 For more restricted access to specific devices, use `--devices` and list them.
 
+
+## Mounting volumes
+
+```
+docker run -it --rm -v $GOOGLE_APPLICATION_CREDENTIALS:/tmp/keys/KEY.json:ro [docker-image]
+```
+
+Where `$GOOGLE_APPLICATION_CREDENTIALS` could be a key location.
