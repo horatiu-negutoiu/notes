@@ -44,7 +44,13 @@ $ docker system prune
 $ docker image prune
 ```
 
-If this doesn't do anything, maybe allocate more space by going into the Docker client settings.
+If this doesn't do anything, maybe allocate more space by going into the Docker client settings, or use the command below.
+
+## Cleanup - removes all images regardless
+
+```
+docker rmi $(docker images -a -q)
+```
 
 ## Privileged mode
 
@@ -54,6 +60,13 @@ $ docker run --privileged -it $IMAGE:$TAG /bin/sh
 ```
 
 For more restricted access to specific devices, use `--devices` and list them.
+
+
+## Get a shell inside a container
+
+```
+docker exec -it a7e7277789f0 /bin/bash
+```
 
 
 ## Mounting volumes

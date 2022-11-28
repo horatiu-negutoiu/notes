@@ -22,6 +22,7 @@ $$
 
 The rows of $\bold{X}$ are written as $x_{1}, x_{2}, \cdots, x_{n}$, where any row $x_{i}$ is a vector of length $p$ containing $p$ variable measurements for the $i$th observation. That is,
 $$
+\begin{equation}
 x_{i} =
 \left[ {\begin{array}{cc}
 x_{i1}\\
@@ -29,6 +30,7 @@ x_{i2}\\
 \vdots\\
 x_{ip}
 \end{array}} \right]
+\tag{1.1}\end{equation}
 $$
 
 Note that the matrix above is represented vertically, because vectors are normally represented vertically, but it is actually a _row_ belonging to $\bold{X}$.

@@ -2,126 +2,206 @@
 
 ## Locally using kubeadm
 
-Pre-flight checks:
+https://www.linuxtechi.com/install-kubernetes-on-ubuntu-22-04/
+Followed this but modified a little.
 
-) Disable swap:
-```
-$ sudo swapoff -a
-```
-) Run the following instructions as `suso su`
+See Appendix A for more docs.
 
-Docs:
-https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
-https://github.com/justmeandopensource/kubernetes/blob/master/docs/install-cluster-ubuntu-20.md
-https://docs.projectcalico.org/getting-started/kubernetes/quickstart
-
-Disable Firewall
+) Log in as root
 ```
+$ sudo su -
+```
+
+### Disable firewall, swap & add kernel settings (both kmaster and kworkers)
+```bash
+# disable firewall
 $ ufw disable
-```
+Firewall stopped and disabled on system startup
 
-Disable swap
-```
-$ swapoff -a; sed -i '/swap/d' /etc/fstab
-```
+# disable swap
+$ swapoff -a
+$ sed -i '/swap/d' /etc/fstab
+# check /etc/fstab to see if the /swap partition is still there
+# if it is, remove it manually or update the command above and try again
+$ swapon --show
+# should not show anything now
 
-Update sysctl settings for Kubernetes networking
-```
-$ cat >>/etc/sysctl.d/kubernetes.conf<<EOF
+$ tee /etc/modules-load.d/containerd.conf <<EOF
+overlay
+br_netfilter
+EOF
+$ modprobe overlay
+$ modprobe br_netfilter
+
+$ tee /etc/sysctl.d/kubernetes.conf <<EOF
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
 EOF
-# normally, this would require a restart, but the command below reloads the config
 
 $ sysctl --system
 ```
 
-Install docker engine
-```
-$ apt install -y apt-transport-https ca-certificates curl gnupg-agent software-properties-common
-$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+### Install containerd run time (both kmaster and kworkers)
+```bash
+# install dependencies
+$ apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
+
+# enable docker repository
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmour -o /etc/apt/trusted.gpg.d/docker.gpg
 $ add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+
+# install containerd
 $ apt update
-$ apt install -y docker-ce=5:19.03.10~3-0~ubuntu-focal containerd.io
+$ apt install -y containerd.io=1.6.10-1
+$ apt-mark hold containerd.io
+
+# configure containerd so that it uses systemd as cgroup
+$ containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
+$ sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/config.toml
+# changes /etc/containerd/config.toml:125  SystemdCgroup = false   to   SystemdCgroup = true
+
+# restart and enable containerd service
+$ systemctl restart containerd # this restarts the service
+$ systemctl enable containerd # should be already activated by this point
+$ systemctl status containerd # ensure the service is active (running)
 ```
 
-Kubernetes Setup
-Add Apt repository
-```
-$ curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
-$ echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" > /etc/apt/sources.list.d/kubernetes.list
+### Install Kubernetes (both kmaster and kworkers)
+```bash
+# add the kubernetes repository
+# MAKE SURE YOU REPLACE "xenial" with whatever ubuntu release the installation is on
+$ curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmour -o /etc/apt/trusted.gpg.d/apt-key.gpg
+$ apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+# "kubernetes-jammy" didn't work as of 2022-11-28
+
+# install kubernetes
+$ apt update
+$ apt install -y kubelet=1.25.4-00 kubeadm=1.25.4-00 kubectl=1.25.4-00
+$ apt-mark hold kubelet kubeadm kubectl
 ```
 
-Install Kubernetes components
-```
-$ apt update && apt install -y kubeadm=1.18.5-00 kubelet=1.18.5-00 kubectl=1.18.5-00
-```
+### Initialize MASTER node (control-plane, kmaster only)
+```bash
+# ensure the to-be control plane's ip address is correct
+$ ip address # ex: inet 192.168.1.165/24
+# use it for initialization
+$ kubeadm init --apiserver-advertise-address=192.168.1.165 --pod-network-cidr=10.0.0.0/16  --ignore-preflight-errors=all
 
-On kmaster
-Initialize Kubernetes Cluster
-```
-$ kubeadm init --pod-network-cidr=192.168.0.0/16  --ignore-preflight-errors=all
-```
+# COPY THE JOIN COMMAND
 
-Deploy Calico network
-```
-$ kubectl --kubeconfig=/etc/kubernetes/admin.conf create -f https://docs.projectcalico.org/v3.14/manifests/calico.yaml
-```
+# EXIT SUDO
+exit
 
-Cluster join command
-```
-$ kubeadm token create --print-join-command
-# to be used by joining nodes
-```
-
-**To be able to run kubectl commands as non-root user**
-If you want to be able to run kubectl commands as non-root user, then as a non-root user perform these
-```
+# copy the cluster config
 $ mkdir -p $HOME/.kube
 $ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
-```
 
-**To be able to run commands from another computer**
-```
-scp root@<lan-ip>:~/.kube/config ~/.kube/config
-# watch out not to override your existing config file
-# maybe first copy it somewhere else locally instead
-```
-
-To merge the config files:
-- copy the remote `config` file somewhere else
-- open copied `config` file with editor
-- open `~/.kube/config` file with editor
-- copy `cluster`, `context`, `user` from first config to second, give them relevant names
-- save and close
-
-Test with
-```
+# get cluster info to ensure it's running
 $ kubectl cluster-info
+Kubernetes control plane is running at https://192.168.1.165:6443
+CoreDNS is running at https://192.168.1.165:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
+
+# list nodes
+$ kubectl get nodes
+NAME   STATUS     ROLES           AGE     VERSION
+ant    NotReady   control-plane   2m39s   v1.25.4
+# nodes are not ready because we need a pod network
+```
+
+### Install the Calico Pod Network (kmaster only)
+
+) Install the tigera Calico operator:
+```bash
+$ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.5/manifests/tigera-operator.yaml
+... created
+... created
+```
+
+) Install Calico by creating the necessary custom resource
+
+```bash
+# this updated yaml includes modifications to the IP pool CIDR
+# downloaded from https://raw.githubusercontent.com/projectcalico/calico/v3.24.5/manifests/custom-resources.yaml
+$ tee ~/calico.yaml <<EOF
+apiVersion: operator.tigera.io/v1
+kind: Installation
+metadata:
+  name: default
+spec:
+  calicoNetwork:
+    ipPools:
+    - blockSize: 26
+      cidr: 10.0.0.0/16
+      encapsulation: VXLANCrossSubnet
+      natOutgoing: Enabled
+      nodeSelector: all()
+---
+apiVersion: operator.tigera.io/v1
+kind: APIServer 
+metadata: 
+  name: default 
+spec: {}
+EOF
+
+$ kubectl create -f calico.yaml
+installation.operator.tigera.io/default created
+apiserver.operator.tigera.io/default created
+
+# ensure that all the pods are running:
+$ watch kubectl get pods -n calico-system
+```
+
+) Optional: for a single-cluster system, remove the taints on the master node:
+```bash
+$ kubectl taint nodes --all node-role.kubernetes.io/control-plane- node-role.kubernetes.io/master-
+node/<your-hostname> untainted
+
+$ kubectl get nodes -o wide
+NAME   STATUS   ROLES           AGE   VERSION   INTERNAL-IP     EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
+ant    Ready    control-plane   20m   v1.25.4   192.168.1.165   <none>        Ubuntu 22.04.1 LTS   5.15.0-53-generic   containerd://1.6.10
 ```
 
 
-### Uninstall Kubernetes
+### Initialize WORKER nodes (kworkers only)
 
+In case the join command is lost, run this on the kmaster:
+```bash
+$ kubeadm token create --print-join-command --v=5
 ```
-$ kubeadm reset
-$ sudo apt-get purge kubeadm kubectl kubelet kubernetes-cni kube*   
-$ sudo apt-get autoremove  
-$ sudo rm -rf ~/.kube
+
+Run the `kubeadm join` command copied from the master node:
+```bash
+$ sudo kubeadm join 192.168.1.165:6443 --token ...
+This node has joined the cluster:
+* Certificate signing request was sent to apiserver and a response was received.
+* The Kubelet was informed of the new secure connection details.
+Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
 ```
-And restart the computer.
+
+Check, on kmaster:
+```bash
+kubectl get nodes -o wide
+NAME   STATUS   ROLES           AGE     VERSION   INTERNAL-IP     EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
+ant    Ready    control-plane   34m     v1.25.4   192.168.1.165   <none>        Ubuntu 22.04.1 LTS   5.15.0-53-generic   containerd://1.6.10
+bee    Ready    <none>          8m42s   v1.25.4   192.168.1.166   <none>        Ubuntu 22.04.1 LTS   5.15.0-53-generic   containerd://1.6.10
+```
+
+Done!
 
 
-## Kubectl
+## Appendix A - More Documentation
 
-Installation:
-```
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-$ chmod +x ./kubectl
-$ sudo mv ./kubectl /usr/local/bin/kubectl
-$ kubectl version -o json
-```
+https://www.linuxtechi.com/install-kubernetes-on-ubuntu-22-04/
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
+https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#initializing-your-control-plane-node
+there's some info here on version skews - kubectl and the control plane cannot differ by more than one _minor_ version.
+https://docs.projectcalico.org/getting-started/kubernetes/quickstart
+https://github.com/justmeandopensource/kubernetes/blob/master/docs/install-cluster-ubuntu-20.md#on-kmaster
+
 
 ## kubectx and kubens
 

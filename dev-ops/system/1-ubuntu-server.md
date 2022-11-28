@@ -72,38 +72,49 @@ $ sudo update-grub
 $ sudo reboot
 ```
 
-## How to get sound going on ubuntu 20.04, Lenovo Thinkbook
+## Managing SWAP
 
-```
-$ sudo nano /etc/modprobe.d/alsa-base.conf
-```
-
-Add the following line to the end of the file:
-```
-options snd-hda-intel single_cmd=1 model=lenovo
+Check if swap is enabled:
+```bash
+$ sudo swapon --show
+NAME      TYPE SIZE USED PRIO
+/swap.img file 3.7G   0B   -2   # enabled in this case
 ```
 
-Exit and restart the alsa driver:
-```
-$ sudo alsa force-reload
-```
-
-## Useful Packages
-
-```
-sudo apt-get install -y \
-    usbmount
+You can also check by running the free command:
+```bash
+$ sudo free -h
+               total        used        free      shared  buff/cache   available
+Mem:           3.7Gi       201Mi       3.2Gi       1.0Mi       313Mi       3.3Gi
+Swap:          3.7Gi          0B       3.7Gi
 ```
 
-## How to Install Nautilus Actions in Ubuntu 18.04
-
-```
-sudo add-apt-repository ppa:daniel-marynicz/filemanager-actions
-sudo apt update
-sudo apt install filemanager-actions-nautilus-extension
+Disable Swap:
+```bash
+$ sudo swapoff -a
+# doesn't return anything
 ```
 
-## Setting nautilus-open-terminal to launch Terminator rather than gnome-terminal
-Open Nautilus Actions
-https://askubuntu.com/questions/76712/setting-nautilus-open-terminal-to-launch-terminator-rather-than-gnome-terminal
-Give in the full path to your command (`/usr/bin/terminator`) and program options (`--working-directory=%d/%b`) for opening the current path in Terminator.
+Remove the swap file:
+```bash
+$ sudo rm /swap.img
+```
+
+Modify the fstab file so that the Swap file is not re-created after a system reboot:
+```bash
+# check that the line exists:
+$ sudo cat /etc/fstab
+...
+/swap.img       none    swap    sw      0       0
+
+# remove the swap entry:
+$ sudo sed -i '/swap/d' /etc/fstab
+
+# check that the swap entry from /etc/fstab has dissapeared
+```
+
+Check if swap is disabled:
+```bash
+$ sudo swapon --show
+# should not return anything
+```

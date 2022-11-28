@@ -208,3 +208,10 @@ $ source my_env/bin/activate
 
 # done, but this forces us to use `pip` and `requirements.txt`, which doesn't enforce dependency versions
 ```
+
+
+## Upgrading pip
+
+```
+pip install --upgrade pip
+```

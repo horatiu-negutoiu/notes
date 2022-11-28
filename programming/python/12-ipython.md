@@ -1,4 +1,4 @@
-# IPython
+# IPython / IPython
 
 ## Install
 
