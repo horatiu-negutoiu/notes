@@ -118,3 +118,22 @@ Check if swap is disabled:
 $ sudo swapon --show
 # should not return anything
 ```
+
+## Formatting a drive
+
+Unmount the drive:
+```shell
+$ sudo umount /mnt/sdd2
+
+# if you can't unmount it, restart the nas
+```
+
+Install the `ntfs-3g` utility:
+```shell
+$ sudo apt-get install ntfs-3g
+```
+
+Quick format the drive:
+```shell
+$ sudo mkfs.ntfs --quick /dev/sdd2
+```
