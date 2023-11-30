@@ -1,5 +1,12 @@
 # Web / PHP-Wordpress / Installation
 
+## Linux - LAMP
+
+- Install Webmin
+- Use Webmin to install Apache2 server
+- Use Webmin to install Mysql/MariaDB
+
+
 ## Windows - XAMPP
 
 - Install XAMPP;
