@@ -13,6 +13,11 @@ $ ssh user@target-ip
 <type password>
 ```
 
+To use a particular private key:
+```
+$ ssh -i /path/to/private/key user@target-ip
+```
+
 Exit.
 ```
 $ exit    # disconnects from target computer

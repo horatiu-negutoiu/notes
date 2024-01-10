@@ -1,5 +1,22 @@
 # System / Ubuntu Desktop
 
+## Ubuntu Desktop Shortcuts
+
+```
+Super                       Switch between the Activities overview and desktop.
+Super + `                   Switch between windows from the same application.
+Super + Shift + <-/->       Move the current window one monitor to the left/right.
+Super + Up Key              Maximize window.
+Super + Down Key            Back to original size.
+Super + Left Key            Align to left side of the active screen.
+Super + Right Key           Align to right side of the active screen.
+
+Ctrl + H                    Show hidden files.
+
+Print                       Screenshot tool.
+```
+
+
 ## How to get sound going on ubuntu 20.04, Lenovo Thinkbook
 
 ```
