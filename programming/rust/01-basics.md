@@ -302,12 +302,9 @@ fn main() {
 }
 ```
 
+## Type conversion
 
-
-
-
-
-
-
-
-
+```rust
+let account_id: i32 = 3;
+let new_account_id: u32 = account_id.into();
+```
