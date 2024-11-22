@@ -53,7 +53,8 @@ $ add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu 
 
 # install containerd
 $ apt update
-$ apt install -y containerd.io=1.6.10-1
+$ apt install -y containerd.io=1.7.23-1
+# old command: $ apt install -y containerd.io=1.6.10-1
 $ apt-mark hold containerd.io
 
 # configure containerd so that it uses systemd as cgroup
@@ -70,14 +71,12 @@ $ systemctl status containerd # ensure the service is active (running)
 ### Install Kubernetes (both kmaster and kworkers)
 ```bash
 # add the kubernetes repository
-# MAKE SURE YOU REPLACE "xenial" with whatever ubuntu release the installation is on
-$ curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmour -o /etc/apt/trusted.gpg.d/apt-key.gpg
-$ apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
-# "kubernetes-jammy" didn't work as of 2022-11-28
+$ echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+$ curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 # install kubernetes
 $ apt update
-$ apt install -y kubelet=1.25.4-00 kubeadm=1.25.4-00 kubectl=1.25.4-00
+$ apt install -y kubelet=1.28.15-1.1 kubeadm=1.28.15-1.1 kubectl=1.28.15-1.1
 $ apt-mark hold kubelet kubeadm kubectl
 ```
 
@@ -86,7 +85,7 @@ $ apt-mark hold kubelet kubeadm kubectl
 # ensure the to-be control plane's ip address is correct
 $ ip address # ex: inet 192.168.1.165/24
 # use it for initialization
-$ kubeadm init --apiserver-advertise-address=192.168.1.165 --pod-network-cidr=10.0.0.0/16  --ignore-preflight-errors=all
+$ kubeadm init --apiserver-advertise-address=192.168.3.101 --pod-network-cidr=10.0.0.0/16  --ignore-preflight-errors=all
 
 # COPY THE JOIN COMMAND
 
@@ -100,8 +99,8 @@ $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 # get cluster info to ensure it's running
 $ kubectl cluster-info
-Kubernetes control plane is running at https://192.168.1.165:6443
-CoreDNS is running at https://192.168.1.165:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+Kubernetes control plane is running at https://192.168.3.101:6443
+CoreDNS is running at https://192.168.3.101:6443/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
 To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
 
 # list nodes
@@ -115,7 +114,7 @@ ant    NotReady   control-plane   2m39s   v1.25.4
 
 ) Install the tigera Calico operator:
 ```bash
-$ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.5/manifests/tigera-operator.yaml
+$ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/tigera-operator.yaml
 ... created
 ... created
 ```
@@ -124,13 +123,14 @@ $ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24
 
 ```bash
 # this updated yaml includes modifications to the IP pool CIDR
-# downloaded from https://raw.githubusercontent.com/projectcalico/calico/v3.24.5/manifests/custom-resources.yaml
+# downloaded from https://raw.githubusercontent.com/projectcalico/calico/v3.29.1/manifests/custom-resources.yaml
 $ tee ~/calico.yaml <<EOF
 apiVersion: operator.tigera.io/v1
 kind: Installation
 metadata:
   name: default
 spec:
+  # Configures Calico networking.
   calicoNetwork:
     ipPools:
     - blockSize: 26
@@ -139,6 +139,8 @@ spec:
       natOutgoing: Enabled
       nodeSelector: all()
 ---
+# This section configures the Calico API server.
+# For more information, see: https://docs.tigera.io/calico/latest/reference/installation/api#operator.tigera.io/v1.APIServer
 apiVersion: operator.tigera.io/v1
 kind: APIServer 
 metadata: 
@@ -152,6 +154,11 @@ apiserver.operator.tigera.io/default created
 
 # ensure that all the pods are running:
 $ watch kubectl get pods -n calico-system
+# NAME                                       READY   STATUS    RESTARTS   AGE
+# calico-kube-controllers-6786bb67ff-zw4rc   1/1     Running   0          3m10s
+# calico-node-fvw96                          1/1     Running   0          3m10s
+# calico-typha-95f888f84-lhqzv               1/1     Running   0          3m11s
+# csi-node-driver-d6xcp                      2/2     Running   0          3m10
 ```
 
 ) Optional: for a single-cluster system, remove the taints on the master node:
@@ -160,8 +167,8 @@ $ kubectl taint nodes --all node-role.kubernetes.io/control-plane- node-role.kub
 node/<your-hostname> untainted
 
 $ kubectl get nodes -o wide
-NAME   STATUS   ROLES           AGE   VERSION   INTERNAL-IP     EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
-ant    Ready    control-plane   20m   v1.25.4   192.168.1.165   <none>        Ubuntu 22.04.1 LTS   5.15.0-53-generic   containerd://1.6.10
+NAME   STATUS   ROLES           AGE   VERSION    INTERNAL-IP     EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION     CONTAINER-RUNTIME
+ant    Ready    control-plane   18m   v1.28.15   192.168.3.101   <none>        Ubuntu 24.04.1 LTS   6.8.0-48-generic   containerd://1.7.23
 ```
 
 
@@ -172,9 +179,9 @@ In case the join command is lost, run this on the kmaster:
 $ kubeadm token create --print-join-command --v=5
 ```
 
-Run the `kubeadm join` command copied from the master node:
+Sudo run the `kubeadm join` command copied from the master node:
 ```bash
-$ sudo kubeadm join 192.168.1.165:6443 --token ...
+$ sudo kubeadm join 192.168.3.101:6443 --token ...
 This node has joined the cluster:
 * Certificate signing request was sent to apiserver and a response was received.
 * The Kubelet was informed of the new secure connection details.
@@ -183,10 +190,10 @@ Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
 
 Check, on kmaster:
 ```bash
-kubectl get nodes -o wide
-NAME   STATUS   ROLES           AGE     VERSION   INTERNAL-IP     EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION      CONTAINER-RUNTIME
-ant    Ready    control-plane   34m     v1.25.4   192.168.1.165   <none>        Ubuntu 22.04.1 LTS   5.15.0-53-generic   containerd://1.6.10
-bee    Ready    <none>          8m42s   v1.25.4   192.168.1.166   <none>        Ubuntu 22.04.1 LTS   5.15.0-53-generic   containerd://1.6.10
+$ kubectl get nodes -o wide
+NAME   STATUS   ROLES           AGE   VERSION    INTERNAL-IP     EXTERNAL-IP   OS-IMAGE             KERNEL-VERSION     CONTAINER-RUNTIME
+ant    Ready    control-plane   34m   v1.28.15   192.168.3.101   <none>        Ubuntu 24.04.1 LTS   6.8.0-48-generic   containerd://1.7.23
+bee    Ready    <none>          58s   v1.28.15   192.168.3.102   <none>        Ubuntu 24.04.1 LTS   6.8.0-48-generic   containerd://1.7.23
 ```
 
 Done!
