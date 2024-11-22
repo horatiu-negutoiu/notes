@@ -199,6 +199,23 @@ bee    Ready    <none>          58s   v1.28.15   192.168.3.102   <none>        U
 Done!
 
 
+# copy context locally
+
+Finally, we want to be able to use the `kubectl` command to control the cluster:
+```bash
+# ssh into control plane, then
+$ sudo cp /etc/kubernetes/admin.conf ~/kubeconfig
+$ chown $(whoami):$(whoami) kubeconfig
+$ exit
+```
+Then, on the local computer:
+```bash
+$ scp ant@ant:~/kubeconfig ~/.kube/config
+# now test
+$ kubectl cluster-info
+```
+
+
 ## Appendix A - More Documentation
 
 https://www.linuxtechi.com/install-kubernetes-on-ubuntu-22-04/
