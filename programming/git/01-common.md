@@ -77,3 +77,9 @@ gitstash nice
 
 gitstashapply nice
 ```
+
+# Find commits from an author in unmerged branches
+
+```bash
+$ git for-each-ref --format='%(committerdate) %09 %(authoremail) %09 %(refname)' | sort -k5n -k2M -k3n -k4n | grep <author-email>
+```
