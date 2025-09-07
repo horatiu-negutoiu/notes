@@ -1,6 +1,8 @@
-# GCP MLE Certification / Notes
+# GCP MLE Certification / Exam Guide
 
 ## Exam Overview
+
+[Link to exam guide](./resources/exam-guide-v4.0.pdf)
 
 - 60 question exam in 120 mins
 - all multiple-choice
@@ -54,4 +56,7 @@ Practice exams:
 - The ones in the book above
 - Google's sample questions (higher difficulty than exam questions)
 ChatGPT
+
+
+
 
