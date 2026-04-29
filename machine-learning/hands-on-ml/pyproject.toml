@@ -1,0 +1,11 @@
+[project]
+name = "hands-on-ml"
+version = "0.1.0"
+description = "Practice project for ML concepts"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "matplotlib==3.10.6",
+    "pandas==2.3.2",
+    "scikit-learn==1.7.1",
+]
